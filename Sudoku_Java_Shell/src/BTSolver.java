@@ -62,7 +62,22 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
-		return false;
+		if (!assignmentsCheck)
+			return false;
+
+		for (Variable v : network.getVariables())
+				if (v.isAssigned()) {
+					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+						vAssignment = v.getAssignment();
+						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
+							return false;
+						neighbor.removeValueFromDomain(vAssignment);
+						if (neighbor.getDomain.size() == 0) //neighbor has no value left to assign
+							return false;
+					}
+			}
+		
+		return true;
 	}
 
 	/**
@@ -118,13 +133,16 @@ public class BTSolver
 	 */
 	private Variable getMRV ( )
 	{
-		Variable mrvVariable = getfirstUnassignedVariable();
-
-		if (mrvVariable != null)
-			for (Variable v : network.getVariables())
-				if(!v.isAssigned())
-					if(v.domain.size() < mrvVariable.domain.size())
+		Variable mrvVariable = null();
+		int minValues = int.MAX_VaLUE;
+		
+		for (Variable v : network.getVariables())
+			if(!v.isAssigned())
+				if(v.domain.size() < minValues)
+					{
 						mrvVariable = v;
+						minValues = v.domain.size();
+					}
 					
 		return mrvVariable;
 	}
@@ -193,7 +211,9 @@ public class BTSolver
 	 */
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
-		return null;
+		List<Integer> l = v.getDomain().getValues();
+
+		return l;
 	}
 
 	/**
