@@ -118,7 +118,15 @@ public class BTSolver
 	 */
 	private Variable getMRV ( )
 	{
-		return null;
+		Variable mrvVariable = getfirstUnassignedVariable();
+
+		if (mrvVariable != null)
+			for (Variable v : network.getVariables())
+				if(!v.isAssigned())
+					if(v.domain.size() < mrvVariable.domain.size())
+						mrvVariable = v;
+					
+		return mrvVariable;
 	}
 
 	/**
