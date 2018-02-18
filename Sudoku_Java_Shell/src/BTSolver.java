@@ -62,9 +62,11 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
-		if (!assignmentsCheck)
-			return false;
+		int vAssignment = 0;
 
+		if (!assignmentsCheck())
+			return false;
+			
 		for (Variable v : network.getVariables())
 				if (v.isAssigned()) {
 					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
@@ -72,7 +74,7 @@ public class BTSolver
 						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
 							return false;
 						neighbor.removeValueFromDomain(vAssignment);
-						if (neighbor.getDomain.size() == 0) //neighbor has no value left to assign
+						if (neighbor.getDomain().size() == 0) //neighbor has no value left to assign
 							return false;
 					}
 			}
@@ -133,15 +135,15 @@ public class BTSolver
 	 */
 	private Variable getMRV ( )
 	{
-		Variable mrvVariable = null();
-		int minValues = int.MAX_VaLUE;
+		Variable mrvVariable = null;
+		int minValues = 0;
 		
 		for (Variable v : network.getVariables())
 			if(!v.isAssigned())
-				if(v.domain.size() < minValues)
+				if(v.getDomain().size() < minValues)
 					{
 						mrvVariable = v;
-						minValues = v.domain.size();
+						minValues = v.getDomain().size();
 					}
 					
 		return mrvVariable;
@@ -212,24 +214,24 @@ public class BTSolver
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
 		List<Integer> values = v.getDomain().getValues();
-
+	
 		Comparator<Integer> valueComparator = new Comparator<Integer>(){
 			@Override
 			public int compare(Integer i1, Integer i2){
-				i1Count = 0;
-				i2Count = 0;
+				int i1Count = 0;
+				int i2Count = 0;
 
 				for (Variable neighbor : network.getNeighborsOfVariable(v))
-					if (neighbor.domain.contains(i1))
+					if (neighbor.getDomain().contains(i1))
 						i1Count++;
-					if (neighbor.domain.contains(i2))
+					else
 						i2Count++;
-				return i1Count.compareTo(i2Count);
+				return i1Count - i2Count;
 			}
-		}
+		};
 
-		Collections.sort (l, valueComparator); //ascending order
-		return l;
+		Collections.sort (values, valueComparator); //ascending order
+		return values;
 	}
 
 	/**
