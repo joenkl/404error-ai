@@ -73,6 +73,7 @@ public class BTSolver
 						vAssignment = v.getAssignment();
 						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
 							return false;
+						
 						neighbor.removeValueFromDomain(vAssignment);
 						if (neighbor.getDomain().size() == 0) //neighbor has no value left to assign
 							return false;
@@ -136,16 +137,19 @@ public class BTSolver
 	private Variable getMRV ( )
 	{
 		Variable mrvVariable = null;
-		int minValues = 0;
+		int minValues = 99999;
 		
 		for (Variable v : network.getVariables())
-			if(!v.isAssigned())
+			if(!v.isAssigned()){
+				if (v.getDomain().isEmpty())
+					return null;
+				
 				if(v.getDomain().size() < minValues)
-					{
-						mrvVariable = v;
-						minValues = v.getDomain().size();
-					}
-					
+				{
+					mrvVariable = v;
+					minValues = v.getDomain().size();
+				}
+			}	
 		return mrvVariable;
 	}
 
