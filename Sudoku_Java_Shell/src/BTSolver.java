@@ -211,8 +211,24 @@ public class BTSolver
 	 */
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
-		List<Integer> l = v.getDomain().getValues();
+		List<Integer> values = v.getDomain().getValues();
 
+		Comparator<Integer> valueComparator = new Comparator<Integer>(){
+			@Override
+			public int compare(Integer i1, Integer i2){
+				i1Count = 0;
+				i2Count = 0;
+
+				for (Variable neighbor : network.getNeighborsOfVariable(v))
+					if (neighbor.domain.contains(i1))
+						i1Count++;
+					if (neighbor.domain.contains(i2))
+						i2Count++;
+				return i1Count.compareTo(i2Count);
+			}
+		}
+
+		Collections.sort (l, valueComparator); //ascending order
 		return l;
 	}
 
