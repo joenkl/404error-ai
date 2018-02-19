@@ -62,14 +62,14 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
-		for (Constraint c : network.getModifiedConstraints())
-			if (! c.isConsistent())
+		for ( Constraint c : network.getModifiedConstraints() )
+			if ( ! c.isConsistent() )
 				return false;
 		int vAssignment = 0;	
 		for (Variable v : network.getVariables())
 				if (v.isAssigned()) {
+					vAssignment = v.getAssignment();
 					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						vAssignment = v.getAssignment();
 						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
 							return false;
 						trail.push(neighbor);
