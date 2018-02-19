@@ -60,27 +60,28 @@ public class BTSolver
 	 * Note: remember to trail.push variables before you assign them
 	 * Return: true is assignment is consistent, false otherwise
 	 */
-	private boolean forwardChecking ( )
-	{
-		for ( Constraint c : network.getModifiedConstraints() )
-			if ( ! c.isConsistent() )
-				return false;
-		int vAssignment = 0;	
-		for (Variable v : network.getVariables())
-				if (v.isAssigned()) {
-					vAssignment = v.getAssignment();
-					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
-							return false;
-						trail.push(neighbor);
-						neighbor.removeValueFromDomain(vAssignment);
-						if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
-							return false;
-					}
-			}
-		
-		return true;
-	}
+private boolean forwardChecking ( )
+  {
+    int vAssignment = 0;  
+    for (Variable v : network.getVariables())
+        if (v.isAssigned()) {
+          for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+			vAssignment = v.getAssignment();
+			if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
+              return false;
+            trail.push(neighbor);
+            neighbor.removeValueFromDomain(vAssignment);
+            if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
+              return false;
+          }
+      }
+	
+	for (Constraint c : network.getModifiedConstraints())
+	  if (! c.isConsistent())
+	  	return false;
+	  
+    return true;
+  }
 
 	/**
 	 * Part 2 TODO: Implement both of Norvig's Heuristics
