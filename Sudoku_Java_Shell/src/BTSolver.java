@@ -1,6 +1,8 @@
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 public class BTSolver
 {
@@ -61,29 +63,29 @@ public class BTSolver
 	 * Return: true is assignment is consistent, false otherwise
 	 */
 
-	private int getIndexOf(Variable v){
-		int nSize = network.getVariables().size();
-		int i=0;
-		while (i < nSize){
-			if (v == this.network.getVariables().get(i))
-				return i;
-			i++;
-		}
-		return -1;
+	private boolean modifiedConStraintsCheck(){
+		for ( Constraint c : network.getModifiedConstraints() )
+			if ( ! c.isConsistent() )
+				return false;
+		return true;
 	}
-	private boolean forwardChecking ()
+	private boolean forwardChecking ( )
 	{
-		List<Variable> vList = network.getVariables();
-		for (Variable v : vList){
-			if (v.isAssigned()){
-				for (Variable n : network.getNeighborsOfVariable(v)){
-					trail.push(n);
-					network.getVariables().get(getIndexOf(n)).removeValueFromDomain(v.getAssignment());
+		for(Variable v: network.getVariables()) {
+			if(v.isAssigned()) {
+				for(Variable neighbor: network.getNeighborsOfVariable(v)) {
+						if (neighbor.getAssignment() == v.getAssignment())
+							return false;
+					
+						trail.push(neighbor);
+						neighbor.removeValueFromDomain(v.getAssignment());
+						if(neighbor.getDomain().isEmpty()) {
+							return false;
+						}
+					}
 				}
 			}
-		}
-
-		return assignmentsCheck();
+		return true;
 	}
 
 	/**
