@@ -57,29 +57,12 @@ public class BTSolver
 	 * (1) If a variable is assigned then eliminate that value from
 	 *     the square's neighbors.
 	 *
-	 * Note: remember to trail.push variables before you assign them
+	 * Note: remember to trail.push variables before you change their domain
 	 * Return: true is assignment is consistent, false otherwise
 	 */
 	private boolean forwardChecking ( )
 	{
-		int vAssignment = 0;
-
-		if (!assignmentsCheck())
-			return false;
-			
-		for (Variable v : network.getVariables())
-				if (v.isAssigned()) {
-					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						vAssignment = v.getAssignment();
-						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
-							return false;
-						neighbor.removeValueFromDomain(vAssignment);
-						if (neighbor.getDomain().size() == 0) //neighbor has no value left to assign
-							return false;
-					}
-			}
-		
-		return true;
+		return false;
 	}
 
 	/**
@@ -94,7 +77,7 @@ public class BTSolver
 	 * (2) If a constraint has only one possible place for a value
 	 *     then put the value there.
 	 *
-	 * Note: remember to trail.push variables before you assign them
+	 * Note: remember to trail.push variables before you change their domain
 	 * Return: true is assignment is consistent, false otherwise
 	 */
 	private boolean norvigCheck ( )
@@ -135,18 +118,7 @@ public class BTSolver
 	 */
 	private Variable getMRV ( )
 	{
-		Variable mrvVariable = null;
-		int minValues = 0;
-		
-		for (Variable v : network.getVariables())
-			if(!v.isAssigned())
-				if(v.getDomain().size() < minValues)
-					{
-						mrvVariable = v;
-						minValues = v.getDomain().size();
-					}
-					
-		return mrvVariable;
+		return null;
 	}
 
 	/**
@@ -213,25 +185,7 @@ public class BTSolver
 	 */
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
-		List<Integer> values = v.getDomain().getValues();
-	
-		Comparator<Integer> valueComparator = new Comparator<Integer>(){
-			@Override
-			public int compare(Integer i1, Integer i2){
-				int i1Count = 0;
-				int i2Count = 0;
-
-				for (Variable neighbor : network.getNeighborsOfVariable(v))
-					if (neighbor.getDomain().contains(i1))
-						i1Count++;
-					else
-						i2Count++;
-				return i1Count - i2Count;
-			}
-		};
-
-		Collections.sort (values, valueComparator); //ascending order
-		return values;
+		return null;
 	}
 
 	/**
