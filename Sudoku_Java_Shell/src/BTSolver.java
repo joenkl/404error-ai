@@ -60,25 +60,30 @@ public class BTSolver
 	 * Note: remember to trail.push variables before you change their domain
 	 * Return: true is assignment is consistent, false otherwise
 	 */
-	private boolean forwardChecking ( )
+
+	private int getIndexOf(Variable v){
+		int nSize = network.getVariables().size();
+		int i=0;
+		while (i < nSize){
+			if (v == this.network.getVariables().get(i))
+				return i;
+			i++;
+		}
+		return -1;
+	}
+	private boolean forwardChecking ()
 	{
-		int vAssignment = 0;  
-		for (Variable v : network.getVariables())
-			if (v.isAssigned()) {
-			  for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-		  vAssignment = v.getAssignment();
-		  if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
-				  return false;
-				trail.push(neighbor);
-				neighbor.removeValueFromDomain(vAssignment);
-				if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
-					return false;
-				for (Constraint c : network.getModifiedConstraints())
-					if (! c.isConsistent())
-				  		return false;
-			  }
-		  }		
-		return true;
+		List<Variable> vList = network.getVariables();
+		for (Variable v : vList){
+			if (v.isAssigned()){
+				for (Variable n : network.getNeighborsOfVariable(v)){
+					trail.push(n);
+					network.getVariables().get(getIndexOf(n)).removeValueFromDomain(v.getAssignment());
+				}
+			}
+		}
+
+		return assignmentsCheck();
 	}
 
 	/**
