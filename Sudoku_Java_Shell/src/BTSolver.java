@@ -62,11 +62,7 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
-		int vAssignment = 0;
-
-		if (!assignmentsCheck())
-			return false;
-			
+		int vAssignment = 0;	
 		for (Variable v : network.getVariables())
 				if (v.isAssigned()) {
 					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
@@ -75,7 +71,7 @@ public class BTSolver
 							return false;
 						trail.push(neighbor);
 						neighbor.removeValueFromDomain(vAssignment);
-						if (neighbor.getDomain().size() == 0) //neighbor has no value left to assign
+						if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
 							return false;
 					}
 			}
@@ -218,19 +214,19 @@ public class BTSolver
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
 		List<Integer> values = v.getDomain().getValues();
-	
+		
+		final Variable v2 = v;
 		Comparator<Integer> valueComparator = new Comparator<Integer>(){
 			@Override
 			public int compare(Integer i1, Integer i2){
-				int i1Count = 0;
-				int i2Count = 0;
-
-				for (Variable neighbor : network.getNeighborsOfVariable(v))
+				Integer i1Count = 0;
+				Integer i2Count = 0;
+				for (Variable neighbor : network.getNeighborsOfVariable(v2))
 					if (neighbor.getDomain().contains(i1))
 						i1Count++;
 					else
 						i2Count++;
-				return i1Count - i2Count;
+				return i1Count.compareTo(i2Count);
 			}
 		};
 
