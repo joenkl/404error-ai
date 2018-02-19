@@ -62,6 +62,9 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
+		for (Constraint c : network.getModifiedConstraints())
+			if (! c.isConsistent())
+				return false;
 		int vAssignment = 0;	
 		for (Variable v : network.getVariables())
 				if (v.isAssigned()) {
