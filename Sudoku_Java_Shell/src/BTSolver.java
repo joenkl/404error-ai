@@ -62,7 +62,23 @@ public class BTSolver
 	 */
 	private boolean forwardChecking ( )
 	{
-		return false;
+		int vAssignment = 0;  
+		for (Variable v : network.getVariables())
+			if (v.isAssigned()) {
+			  for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+		  vAssignment = v.getAssignment();
+		  if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
+				  return false;
+				trail.push(neighbor);
+				neighbor.removeValueFromDomain(vAssignment);
+				for (Constraint c : network.getModifiedConstraints())
+					if (! c.isConsistent())
+				  		return false;
+				if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
+				  return false;
+			  }
+		  }		
+		return true;
 	}
 
 	/**
@@ -118,7 +134,21 @@ public class BTSolver
 	 */
 	private Variable getMRV ( )
 	{
-		return null;
+		Variable mrvVariable = null;
+		int minValues = 99999;
+		
+		for (Variable v : network.getVariables())
+		if(!v.isAssigned()){
+			if (v.getDomain().isEmpty())
+			return null;
+			
+			if(v.getDomain().size() < minValues)
+			{
+			mrvVariable = v;
+			minValues = v.getDomain().size();
+			}
+		}  
+		return mrvVariable;
 	}
 
 	/**
@@ -185,7 +215,25 @@ public class BTSolver
 	 */
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
-		return null;
+		List<Integer> values = v.getDomain().getValues();
+    
+		final Variable v2 = v;
+		Comparator<Integer> valueComparator = new Comparator<Integer>(){
+		  @Override
+		  public int compare(Integer i1, Integer i2){
+			Integer i1Count = 0;
+			Integer i2Count = 0;
+			for (Variable neighbor : network.getNeighborsOfVariable(v2))
+			  if (neighbor.getDomain().contains(i1))
+				i1Count++;
+			  else
+				i2Count++;
+			return i1Count.compareTo(i2Count);
+		  }
+		};
+	 
+		Collections.sort (values, valueComparator); //ascending order
+		return values;
 	}
 
 	/**
