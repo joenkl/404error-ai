@@ -71,11 +71,11 @@ public class BTSolver
 				  return false;
 				trail.push(neighbor);
 				neighbor.removeValueFromDomain(vAssignment);
+				if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
+					return false;
 				for (Constraint c : network.getModifiedConstraints())
 					if (! c.isConsistent())
 				  		return false;
-				if (neighbor.getDomain().isEmpty()) //neighbor has no value left to assign
-				  return false;
 			  }
 		  }		
 		return true;
