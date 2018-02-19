@@ -73,7 +73,7 @@ public class BTSolver
 						vAssignment = v.getAssignment();
 						if (vAssignment == neighbor.getAssignment()) // v conflict with neighbor
 							return false;
-						
+						trail.push(v);
 						neighbor.removeValueFromDomain(vAssignment);
 						if (neighbor.getDomain().size() == 0) //neighbor has no value left to assign
 							return false;
