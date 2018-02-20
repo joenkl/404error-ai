@@ -70,11 +70,7 @@ public class BTSolver
 		return true;
 	}
 	private boolean forwardChecking ( )
-	{
-		if (!assignmentsCheck())
-			return false;
-		
-		
+	{	
 		for(Variable v: network.getVariables()) {
 			if(v.isAssigned()) {
 				for(Variable neighbor: network.getNeighborsOfVariable(v)) {
