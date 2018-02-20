@@ -71,17 +71,25 @@ public class BTSolver
 	}
 	private boolean forwardChecking ( )
 	{
+		if (!assignmentsCheck())
+			return false;
+		
+		
 		for(Variable v: network.getVariables()) {
 			if(v.isAssigned()) {
 				for(Variable neighbor: network.getNeighborsOfVariable(v)) {
-						if (neighbor.getAssignment() == v.getAssignment())
+						if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
 							return false;
-					
-						trail.push(neighbor);
-						neighbor.removeValueFromDomain(v.getAssignment());
-						if(neighbor.getDomain().isEmpty()) {
-							return false;
+						//check if domain contain the value
+						//if not, there is no need to remove
+						if (neighbor.getDomain().contains(v.getAssignment())){
+							trail.push(neighbor);
+							neighbor.removeValueFromDomain(v.getAssignment());
+							if(neighbor.getDomain().isEmpty()) {
+								return false;
+							}
 						}
+						
 					}
 				}
 			}
@@ -231,7 +239,7 @@ public class BTSolver
 			Integer i1Count = 0;
 			Integer i2Count = 0;
 			for (Variable neighbor : network.getNeighborsOfVariable(v2))
-			  if (neighbor.getDomain().contains(i1))
+			  if (!neighbor.isAssigned() && neighbor.getDomain().contains(i1))
 				i1Count++;
 			  else
 				i2Count++;
