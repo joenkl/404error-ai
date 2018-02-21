@@ -65,11 +65,11 @@ public class BTSolver
 		for(Variable v: network.getVariables()) {
 			if(v.isAssigned()) {
 				List<Constraint> mcList = network.getModifiedConstraints();
-				List<Variable> visstedNeighbor = new ArrayList<Variable>();
+				
 				for(Variable neighbor: network.getNeighborsOfVariable(v)) {
 						//check if the neighbor is not in the recently modified constrains,
 						//and we did not visit it in this iteration
-						if (!mcList.contains(neighbor) && !visstedNeighbor.contains(neighbor)){
+						if (!mcList.contains(neighbor)){
 							
 							if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
 								return false;
@@ -78,7 +78,6 @@ public class BTSolver
 								//if not, there is no need to remove
 								if (neighbor.getDomain().contains(v.getAssignment())){
 									neighbor.setModified(true);
-									visstedNeighbor.add(neighbor);
 									trail.push(neighbor);
 									neighbor.removeValueFromDomain(v.getAssignment());
 									if(neighbor.getDomain().isEmpty()) {
