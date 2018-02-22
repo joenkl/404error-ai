@@ -59,36 +59,34 @@ public class BTSolver
 	 * Return: true is assignment is consistent, false otherwise
 	 */
 
-
-	private boolean forwardChecking ( )
-	{	
-		for(Variable v: network.getVariables()) {
-			if(v.isAssigned()) {
+	private boolean forwardChecking() {
+		for (Variable v : network.getVariables()) {
+			if (v.isAssigned()) {
 				List<Constraint> mcList = network.getModifiedConstraints();
-				
-				for(Variable neighbor: network.getNeighborsOfVariable(v)) {
-						//check if the neighbor is not in the recently modified constrains,
-						//and we did not visit it in this iteration
-						if (!mcList.contains(neighbor)){
-							
-							if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
-								return false;
-							if (neighbor.isChangeable()){
-								//check if domain contain the value
-								//if not, there is no need to remove
-								if (neighbor.getDomain().contains(v.getAssignment())){
-									neighbor.setModified(true);
-									trail.push(neighbor);
-									neighbor.removeValueFromDomain(v.getAssignment());
-									if(neighbor.getDomain().isEmpty()) {
-										return false;
-									}
+
+				for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+					//check if the neighbor is not in the recently modified constrains,
+					//and we did not visit it in this iteration
+					if (!mcList.contains(neighbor)) {
+
+						if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
+							return false;
+						if (neighbor.isChangeable()) {
+							//check if domain contain the value
+							//if not, there is no need to remove
+							if (neighbor.getDomain().contains(v.getAssignment())) {
+								neighbor.setModified(true);
+								trail.push(neighbor);
+								neighbor.removeValueFromDomain(v.getAssignment());
+								if (neighbor.getDomain().isEmpty()) {
+									return false;
 								}
 							}
 						}
 					}
 				}
 			}
+		}
 		return assignmentsCheck();
 	}
 
