@@ -71,6 +71,9 @@ public class BTSolver
 
 						if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
 							return false;
+						if (neighbor.getDomain().size() == 1 &&
+							neighbor.getDomain().getValues().contains(v.getAssignment()))
+								return false;
 						if (neighbor.isChangeable()) {
 							//check if domain contain the value
 							//if not, there is no need to remove
