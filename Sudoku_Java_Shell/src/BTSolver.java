@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Map.Entry;
 
 public class BTSolver
 {
@@ -187,6 +188,7 @@ public class BTSolver
 			}
 		}
 		return returnValue;
+		
 	}
 
 	/**
@@ -277,27 +279,39 @@ public class BTSolver
 	 * Return: A list of v's domain sorted by the LCV heuristic
 	 *         The LCV is first and the MCV is last
 	 */
+
 	public List<Integer> getValuesLCVOrder ( Variable v )
 	{
-		List<Integer> values = v.getDomain().getValues();
-    
-		final Variable v2 = v;
-		Comparator<Integer> valueComparator = new Comparator<Integer>(){
-		  @Override
-		  public int compare(Integer i1, Integer i2){
-			Integer i1Count = 0;
-			Integer i2Count = 0;
-			for (Variable neighbor : network.getNeighborsOfVariable(v2))
-			  if (!neighbor.isAssigned() && neighbor.getDomain().contains(i1))
-				i1Count++;
-			  else
-				i2Count++;
-			return i1Count.compareTo(i2Count);
-		  }
+		HashMap<Integer, Integer> values = new HashMap<Integer, Integer>();
+		for(Integer value : v.getDomain().getValues()) {
+			int constrainsCount = 0;
+			for (Variable n : network.getNeighborsOfVariable(v))
+				if (n.getDomain().contains(value)){
+					constrainsCount++;
+				}
+
+			values.put(value, constrainsCount);
+		}
+		
+		Comparator<Map.Entry<Integer, Integer>> valueComparator = new Comparator<Map.Entry<Integer,Integer>>(){
+		
+			@Override
+			public int compare(Map.Entry<Integer, Integer> v1, Map.Entry<Integer, Integer> v2) {
+				return v1.getValue().compareTo(v2.getValue());
+			}
 		};
-	 
-		Collections.sort (values, valueComparator); //ascending order
-		return values;
+
+		List<Map.Entry<Integer, Integer>> mapList = new LinkedList<>(values.entrySet());
+
+		Collections.sort(mapList, valueComparator);
+
+		List<Integer> result = new ArrayList<Integer>();
+		Iterator it = mapList.iterator();
+		while (it.hasNext()){
+			Map.Entry pair = (Map.Entry) it.next();
+			result.add((int)pair.getKey());
+		}
+		return result;
 	}
 
 	/**
