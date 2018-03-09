@@ -170,7 +170,23 @@ public class BTSolver
 	 */
 	private Variable getDegree ( )
 	{
-		return null;
+		int constraints = 0, maxConstraints = -1;
+		Variable returnValue = null;
+		boolean isMax = false;
+		for(Variable v: network.getVariables()){
+			if(!v.isAssigned()){
+				constraints = 0;
+				for(Variable n : network.getNeighborsOfVariable(v)){
+					if(!n.isAssigned()) constraints++;
+				}
+				if(constraints > maxConstraints){
+					maxConstraints = constraints;
+					returnValue = v;
+					isMax = true;
+				}
+			}
+		}
+		return returnValue;
 	}
 
 	/**
@@ -180,9 +196,45 @@ public class BTSolver
 	 * Return: The unassigned variable with, first, the smallest domain
 	 *         and, second, the most unassigned neighbors
 	 */
+	private int getDegreeOfVar(Variable v){
+		int degree = 0;
+		for(Variable n : network.getNeighborsOfVariable(v)){
+			if(!n.isAssigned()){
+				degree++;
+			}
+		}
+		return degree;
+	}
+
 	private Variable MRVwithTieBreaker ( )
 	{
-		return null;
+		Variable mrvVariable = null;
+		int minValues = 99999;
+		
+		for (Variable v : network.getVariables())
+		if(!v.isAssigned()){
+			if (v.getDomain().isEmpty())
+			return null;
+			
+			if(v.getDomain().size() < minValues)
+			{
+				mrvVariable = v;
+				minValues = v.getDomain().size();
+			}
+
+			if (v.getDomain().size() == minValues)
+			{
+				int vDegree = getDegreeOfVar(v);
+				int mrvDegree = getDegreeOfVar(mrvVariable);
+
+				if (vDegree < mrvDegree)
+				{
+					mrvVariable = v;
+					minValues = v.getDomain().size();
+				}
+			}
+		}  
+		return mrvVariable;
 	}
 
 	/**
