@@ -1,8 +1,6 @@
 import java.util.*;
 import java.util.Map.Entry;
 
-import javax.swing.SpringLayout.Constraints;
-
 public class BTSolver
 {
 
@@ -100,7 +98,45 @@ public class BTSolver
 	 */
 	private boolean norvigCheck ( )
 	{
-		return false;
+		
+	
+		for (Constraint c : network.getModifiedConstraints()){
+			if (!c.isConsistent())
+				return false;
+			
+				//H1: FC
+			for (Variable v : network.getVariables()) {
+				if (v.isAssigned()) {
+					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+						if (!neighbor.isAssigned())
+							if (neighbor.getDomain().contains(v.getAssignment())){
+								trail.push(neighbor);
+								neighbor.removeValueFromDomain(v.getAssignment());
+							}
+					}
+				}
+			}
+		}
+
+		//H2: if a v domain value is not on other domain => assign 
+		for (Variable v : network.getVariables()) {
+			if (!v.isAssigned()){
+				for (int val : v.getDomain().getValues()) {
+					int count = 0;
+
+					for (Variable n : network.getNeighborsOfVariable(v)) {
+						if (!n.isAssigned() && n.getDomain().contains(val))
+							count++;
+					}
+					
+				 if(count == 0){
+						v.assignValue(val);
+					}
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
