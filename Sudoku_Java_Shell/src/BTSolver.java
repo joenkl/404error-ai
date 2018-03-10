@@ -1,6 +1,8 @@
 import java.util.*;
 import java.util.Map.Entry;
 
+import javax.swing.SpringLayout.Constraints;
+
 public class BTSolver
 {
 
@@ -61,37 +63,24 @@ public class BTSolver
 	 */
 
 	private boolean forwardChecking() {
-		for (Variable v : network.getVariables()) {
-			if (v.isAssigned()) {
-				List<Constraint> mcList = network.getModifiedConstraints();
+		for (Constraint c : network.getModifiedConstraints()){
+			if (!c.isConsistent())
+				return false;
 
-				for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-					//check if the neighbor is not in the recently modified constrains,
-					//and we did not visit it in this iteration
-					if (!mcList.contains(neighbor)) {
-
-						if (neighbor.isAssigned() && neighbor.getAssignment() == v.getAssignment())
-							return false;
-						if (neighbor.getDomain().size() == 1 &&
-							neighbor.getDomain().getValues().contains(v.getAssignment()))
-								return false;
-						if (neighbor.isChangeable()) {
-							//check if domain contain the value
-							//if not, there is no need to remove
-							if (neighbor.getDomain().contains(v.getAssignment())) {
-								neighbor.setModified(true);
+			for (Variable v : network.getVariables()) {
+				if (v.isAssigned()) {
+					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+						if (!neighbor.isAssigned())
+							if (neighbor.getDomain().contains(v.getAssignment())){
 								trail.push(neighbor);
 								neighbor.removeValueFromDomain(v.getAssignment());
-								if (neighbor.getDomain().isEmpty()) {
-									return false;
-								}
 							}
-						}
 					}
 				}
 			}
 		}
-		return assignmentsCheck();
+		
+		return true;
 	}
 
 	/**
@@ -229,7 +218,7 @@ public class BTSolver
 				int vDegree = getDegreeOfVar(v);
 				int mrvDegree = getDegreeOfVar(mrvVariable);
 
-				if (vDegree < mrvDegree)
+				if (vDegree > mrvDegree)
 				{
 					mrvVariable = v;
 					minValues = v.getDomain().size();
@@ -305,6 +294,7 @@ public class BTSolver
 
 		Collections.sort(mapList, valueComparator);
 
+		
 		List<Integer> result = new ArrayList<Integer>();
 		Iterator it = mapList.iterator();
 		while (it.hasNext()){
