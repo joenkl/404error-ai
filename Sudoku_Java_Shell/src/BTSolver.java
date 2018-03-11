@@ -61,24 +61,22 @@ public class BTSolver
 	 */
 
 	private boolean forwardChecking() {
-		for (Constraint c : network.getModifiedConstraints()){
-			if (!c.isConsistent())
-				return false;
+		for (Variable v : network.getVariables()) {
+			if (v.isAssigned()) {
+				for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+					if (!neighbor.isAssigned())
+						if (neighbor.getDomain().contains(v.getAssignment())){
+							trail.push(neighbor);
+							neighbor.removeValueFromDomain(v.getAssignment());
 
-			for (Variable v : network.getVariables()) {
-				if (v.isAssigned()) {
-					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						if (!neighbor.isAssigned())
-							if (neighbor.getDomain().contains(v.getAssignment())){
-								trail.push(neighbor);
-								neighbor.removeValueFromDomain(v.getAssignment());
-							}
-					}
+							for (Constraint c : network.getModifiedConstraints())
+								if (!c.isConsistent())
+									return false;
+						}
 				}
 			}
 		}
-		
-		return true;
+		return assignmentsCheck();
 	}
 
 	/**
