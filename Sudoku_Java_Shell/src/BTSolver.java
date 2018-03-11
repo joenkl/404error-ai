@@ -98,8 +98,6 @@ public class BTSolver
 	 */
 	private boolean norvigCheck ( )
 	{
-		
-	
 		for (Constraint c : network.getModifiedConstraints()){
 			if (!c.isConsistent())
 				return false;
@@ -119,23 +117,32 @@ public class BTSolver
 		}
 
 		//H2: if a v domain value is not on other domain => assign 
-		for (Variable v : network.getVariables()) {
+		for (Variable v : network.getVariables()){
 			if (!v.isAssigned()){
-				for (int val : v.getDomain().getValues()) {
-					int count = 0;
+				for (int val : v.getDomain().getValues()){
+					boolean found = false;
 
-					for (Variable n : network.getNeighborsOfVariable(v)) {
-						if (!n.isAssigned() && n.getDomain().contains(val))
-							count++;
+					for(Variable n : network.getNeighborsOfVariable(v)){
+						if (!n.isAssigned() && n.getDomain().contains(val)){
+							found = true;
+							break;
+						}
 					}
-					
-				 if(count == 0){
-						v.assignValue(val);
+
+					//if there is only 1 place for val
+					if (!found){
+						//if v is not assign
+						if (!v.isAssigned()){
+							v.assignValue(val);
+							v.setModified(true);
+						} else //There are inconsistent cases that more than 1 val can be assigned
+							return false;
 					}
 				}
+
 			}
 		}
-
+		
 		return true;
 	}
 
