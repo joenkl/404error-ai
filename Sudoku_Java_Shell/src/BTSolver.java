@@ -68,11 +68,11 @@ public class BTSolver
 			for (Variable v : network.getVariables()) {
 				if (v.isAssigned()) {
 					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						if (!neighbor.isAssigned())
-							if (neighbor.getDomain().contains(v.getAssignment())){
-								trail.push(neighbor);
-								neighbor.removeValueFromDomain(v.getAssignment());
-							}
+						if (!neighbor.isAssigned() && neighbor.getDomain().contains(v.getAssignment()))
+						{
+							trail.push(neighbor);
+							neighbor.removeValueFromDomain(v.getAssignment());
+						}
 					}
 				}
 			}
