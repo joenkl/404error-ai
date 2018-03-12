@@ -98,19 +98,18 @@ public class BTSolver
 	 */
 	private boolean norvigCheck ( )
 	{
-		for (Constraint c : network.getModifiedConstraints()){
-			if (!c.isConsistent())
-				return false;
-			
-				//H1: FC
-			for (Variable v : network.getVariables()) {
-				if (v.isAssigned()) {
-					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-						if (!neighbor.isAssigned())
-							if (neighbor.getDomain().contains(v.getAssignment())){
-								trail.push(neighbor);
-								neighbor.removeValueFromDomain(v.getAssignment());
-							}
+		for (Variable v : network.getVariables()) {
+			if (v.isAssigned()) {
+				for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+					if (!neighbor.isAssigned() && neighbor.getDomain().contains(v.getAssignment()))
+					{
+						trail.push(neighbor);
+						neighbor.removeValueFromDomain(v.getAssignment());
+
+						for (Constraint c : network.getModifiedConstraints()){
+							if (!c.isConsistent())
+								return false;
+						}
 					}
 				}
 			}
@@ -123,7 +122,7 @@ public class BTSolver
 					boolean found = false;
 
 					for(Variable n : network.getNeighborsOfVariable(v)){
-						if (!n.isAssigned() && n.getDomain().contains(val)){
+						if (n.getDomain().contains(val)){
 							found = true;
 							break;
 						}
@@ -133,6 +132,7 @@ public class BTSolver
 					if (!found){
 						//if v is not assign
 						if (!v.isAssigned()){
+							trail.push(v);
 							v.assignValue(val);
 							v.setModified(true);
 						} else //There are inconsistent cases that more than 1 val can be assigned
