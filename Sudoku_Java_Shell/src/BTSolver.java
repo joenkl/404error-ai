@@ -77,7 +77,6 @@ public class BTSolver
 				}
 			}
 		}
-		
 		return true;
 	}
 
@@ -98,18 +97,18 @@ public class BTSolver
 	 */
 	private boolean norvigCheck ( )
 	{
-		for (Variable v : network.getVariables()) {
-			if (v.isAssigned()) {
-				for (Variable neighbor : network.getNeighborsOfVariable(v)) {
-					if (!neighbor.isAssigned() && neighbor.getDomain().contains(v.getAssignment()))
-					{
-						trail.push(neighbor);
-						neighbor.removeValueFromDomain(v.getAssignment());
+		for (Constraint c : network.getModifiedConstraints()){
+			if (!c.isConsistent())
+				return false;
 
-						for (Constraint c : network.getModifiedConstraints()){
-							if (!c.isConsistent())
-								return false;
-						}
+			for (Variable v : network.getVariables()) {
+				if (v.isAssigned()) {
+					for (Variable neighbor : network.getNeighborsOfVariable(v)) {
+						if (!neighbor.isAssigned())
+							if (neighbor.getDomain().contains(v.getAssignment())){
+								trail.push(neighbor);
+								neighbor.removeValueFromDomain(v.getAssignment());
+							}
 					}
 				}
 			}
@@ -203,19 +202,17 @@ public class BTSolver
 	 */
 	private Variable getDegree ( )
 	{
-		int constraints = 0, maxConstraints = -1;
+		int c = 0, maxConstraints = -1;
 		Variable returnValue = null;
-		boolean isMax = false;
 		for(Variable v: network.getVariables()){
 			if(!v.isAssigned()){
-				constraints = 0;
+				c = 0;
 				for(Variable n : network.getNeighborsOfVariable(v)){
-					if(!n.isAssigned()) constraints++;
+					if(!n.isAssigned()) c++;
 				}
-				if(constraints > maxConstraints){
-					maxConstraints = constraints;
+				if(c > maxConstraints){
+					maxConstraints = c;
 					returnValue = v;
-					isMax = true;
 				}
 			}
 		}
